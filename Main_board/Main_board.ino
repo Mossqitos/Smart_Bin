@@ -102,17 +102,17 @@ void MQSensor() {
     message.subject = F("Notification From Bin");
     message.addRecipient(F("Beer"), RECIPIENT_EMAIL);
 
-    String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!"
+    String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!";
 
     String textMsg = "Dear User,\n\n"
-    "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
-    "Here are some tips to keep it in good condition:\n\n"
-    E"mpty the bin regularly to prevent overfilling.\n\n"
-    "Ensure the lid is properly closed after use.\n\n"
-    "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
-    "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
+                      "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
+                      "Here are some tips to keep it in good condition:\n\n"
+                      "Empty the bin regularly to prevent overfilling.\n\n"
+                      "Ensure the lid is properly closed after use.\n\n"
+                      "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
+                      "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
 
-    "Thank you for being a valued Smart Bin user!\n\n";
+                      "Thank you for being a valued Smart Bin user!\n\n";
     message.subject = subject;
     message.text.content = textMsg.c_str();
     message.text.charSet = "us-ascii";
@@ -139,7 +139,7 @@ void MQSensor() {
     if (!MailClient.sendMail(&smtp, &message)) {
       ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
     } else {
-      Serial.printf("mail Sended")
+      Serial.printf("mail Sended");
     }
   }
 }
@@ -208,17 +208,17 @@ void SMESensor() {
             message.subject = F("Notification From Bin");
             message.addRecipient(F("Beer"), RECIPIENT_EMAIL);
 
-            String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!"
+            String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!";
 
             String textMsg = "Dear User,\n\n"
-            "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
-            "Here are some tips to keep it in good condition:\n\n"
-            E"mpty the bin regularly to prevent overfilling.\n\n"
-            "Ensure the lid is properly closed after use.\n\n"
-            "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
-            "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
+                              "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
+                              "Here are some tips to keep it in good condition:\n\n"
+                              "Empty the bin regularly to prevent overfilling.\n\n"
+                              "Ensure the lid is properly closed after use.\n\n"
+                              "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
+                              "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
 
-            "Thank you for being a valued Smart Bin user!\n\n";
+                              "Thank you for being a valued Smart Bin user!\n\n";
             message.subject = subject;
             message.text.content = textMsg.c_str();
             message.text.charSet = "us-ascii";
@@ -245,7 +245,7 @@ void SMESensor() {
             if (!MailClient.sendMail(&smtp, &message)) {
               ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
             } else {
-              Serial.printf("mail Sended")
+              Serial.printf("mail Sended");
             }
           }
           ultraSerial.println(false);
