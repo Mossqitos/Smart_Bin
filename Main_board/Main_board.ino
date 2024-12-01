@@ -7,6 +7,8 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
+#include <ESP_Mail_Client.h>
+#include <Arduino.h>
 
 #define SMTP_HOST "smtp.gmail.com"
 #define SMTP_PORT 465
@@ -15,8 +17,6 @@
 #define AUTHOR_PASSWORD "tolv vmov gxgb rmsj"
 
 #define RECIPIENT_EMAIL "thanakitmoss@gmail.com"
-
-SMTPSession smtp;
 
 void smtpCallback(SMTP_Status status);
 
@@ -36,6 +36,8 @@ char ssid[] = "Tamao"; // wifi or hotspot name
 char pass[] = "12345679"; // wifi or hotspot pass
 
 BlynkTimer timer;
+
+SMTPSession smtp;
 
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -58,21 +60,13 @@ void setup() {
   binSerial.begin(ESP_BAUD, SERIAL_8N1, RXD1, TXD1);
   ultraSerial.begin(ESP_BAUD, SERIAL_8N1, RXD3, TXD3);
   Blynk.begin(auth, ssid, pass);
-  pinmode(MQ_PIN, INPUT);
+  pinMode(MQ_PIN, INPUT);
   pinMode(IR_PIN, INPUT);
   pinMode(NGANG_PIN, INPUT);
   servo.attach(SERVO_PIN);
   servo.write(0);
 
-  message.sender.name = F("SmartBIN");
-  message.sender.email = AUTHOR_EMAIL;
-  message.subject = F("Notification From Bin");
-  message.addRecipient(F("Bro"), RECIPIENT_EMAIL);
-
-  String textMsg2 = "Your BIN IS ON FIREEEEEE";
-  message.text.content = textMsg1.c_str();
-  message.text.charSet = "us-ascii";
-  message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+  
 
   Serial.println("Serial 2 started at 115200 baud rate");
   timer.setInterval(1000L, MQSensor);
@@ -85,14 +79,67 @@ void MQSensor() {
   Serial.println(MQData);
 
   if(MQData > threshold) {
-    String textMsg1 = "Your Bin is on fired";
-    message.text.content = textMsg1.c_str();
+    MailClient.networkReconnect(true);
+
+    smtp.debug(1);
+
+    Session_Config config;
+
+    config.server.host_name = SMTP_HOST;
+    config.server.port = SMTP_PORT;
+    config.login.email = AUTHOR_EMAIL;
+    config.login.password = AUTHOR_PASSWORD;
+    config.login.user_domain = "";
+
+    config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
+    config.time.gmt_offset = 3;
+    config.time.day_light_offset = 0;
+
+    SMTP_Message message;
+
+    message.sender.name = F("SmartBIN");
+    message.sender.email = AUTHOR_EMAIL;
+    message.subject = F("Notification From Bin");
+    message.addRecipient(F("Beer"), RECIPIENT_EMAIL);
+
+    String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!"
+
+    String textMsg = "Dear User,\n\n"
+    "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
+    "Here are some tips to keep it in good condition:\n\n"
+    E"mpty the bin regularly to prevent overfilling.\n\n"
+    "Ensure the lid is properly closed after use.\n\n"
+    "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
+    "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
+
+    "Thank you for being a valued Smart Bin user!\n\n";
+    message.subject = subject;
+    message.text.content = textMsg.c_str();
     message.text.charSet = "us-ascii";
     message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+
     message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
     message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+
+    if (!smtp.connect(&config)){
+      ESP_MAIL_PRINTF("Connection error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+      return;
+    }
+
+    if (!smtp.isLoggedIn()){
+      Serial.println("\nNot yet logged in.");
+    }
+    else{
+      if (smtp.isAuthenticated())
+        Serial.println("\nSuccessfully logged in.");
+      else
+        Serial.println("\nConnected with no Auth.");
+    }
+            
     if (!MailClient.sendMail(&smtp, &message)) {
       ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+    } else {
+      Serial.printf("mail Sended")
     }
   }
 }
@@ -138,14 +185,67 @@ void SMESensor() {
           int ngangState = digitalRead(NGANG_PIN);
           Serial.println(ngangState);
           if(ngangState == 0) {
-            String textMsg1 = "Your Bin isn't closed";
-            message.text.content = textMsg1.c_str();
+            MailClient.networkReconnect(true);
+
+            smtp.debug(1);
+
+            Session_Config config;
+
+            config.server.host_name = SMTP_HOST;
+            config.server.port = SMTP_PORT;
+            config.login.email = AUTHOR_EMAIL;
+            config.login.password = AUTHOR_PASSWORD;
+            config.login.user_domain = "";
+
+            config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
+            config.time.gmt_offset = 3;
+            config.time.day_light_offset = 0;
+
+            SMTP_Message message;
+
+            message.sender.name = F("SmartBIN");
+            message.sender.email = AUTHOR_EMAIL;
+            message.subject = F("Notification From Bin");
+            message.addRecipient(F("Beer"), RECIPIENT_EMAIL);
+
+            String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!"
+
+            String textMsg = "Dear User,\n\n"
+            "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
+            "Here are some tips to keep it in good condition:\n\n"
+            E"mpty the bin regularly to prevent overfilling.\n\n"
+            "Ensure the lid is properly closed after use.\n\n"
+            "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
+            "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
+
+            "Thank you for being a valued Smart Bin user!\n\n";
+            message.subject = subject;
+            message.text.content = textMsg.c_str();
             message.text.charSet = "us-ascii";
             message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+
             message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
             message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+
+            if (!smtp.connect(&config)){
+              ESP_MAIL_PRINTF("Connection error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+              return;
+            }
+
+            if (!smtp.isLoggedIn()){
+              Serial.println("\nNot yet logged in.");
+            }
+            else{
+              if (smtp.isAuthenticated())
+                Serial.println("\nSuccessfully logged in.");
+              else
+                Serial.println("\nConnected with no Auth.");
+            }
+            
             if (!MailClient.sendMail(&smtp, &message)) {
               ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+            } else {
+              Serial.printf("mail Sended")
             }
           }
           ultraSerial.println(false);
