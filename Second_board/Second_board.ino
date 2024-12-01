@@ -28,6 +28,9 @@ BlynkTimer timer;
 long duration;
 int distance; 
 int binLevel=0;
+int ultrasonicTimerId;
+unsigned long startMillis;
+bool isRunning = false;
 
 #define ESP_BAUD 115200
 HardwareSerial humanSerial(2);
@@ -44,7 +47,8 @@ void setup() {
   Blynk.begin(auth, ssid, pass);
   Serial.println("Serial 2 started at 115200 baud rate");
   timer.setInterval(1000L, SMESensor);
-  // put your setup code here, to run once:
+  ultrasonicTimerId = timer.setInterval(100L, ultrasonic);
+  timer.disable(ultrasonicTimerId);
 }
 
 void ultrasonic() // measure height in dustbin
@@ -116,10 +120,23 @@ void SMESensor() {
       if(binLevel < 100) {
         Serial.println("good");
         binSerial.println(true);
+        Serial.println("Realtime ultrasonic function started.");\
+        timer.enable(ultrasonicTimerId);
+        startMillis = millis();
+        isRunning = true; 
+        Serial.println("Realtime ultrasonic function stoped.");
       } else {
         binSerial.println(false);
       }
-      delay(2000);
+      // // while ( ultraSerial.available() > 0) {
+      //   if(doUltra == '1') {
+      //     // timer.enable(ultrasonicTimerId);
+      //     Serial.println("Realtime ultrasonic function started.");
+      //     delay(3000);
+      //     // timer.disable(ultrasonicTimerId);
+      //     Serial.println("Realtime ultrasonic function stoped.");
+      //   }
+      // // }
     }
     humanSerial.read();
     humanSerial.read();
@@ -129,16 +146,18 @@ void SMESensor() {
     humanSerial.read();
     humanSerial.read();
   }
-  // while ( ultraSerial.available() > 0) {
-  //   char doUltra = ultraSerial.read();
-  //   if(doUltra == '1') {
-  //     ultrasonic();
-  //   }
-  // }
 
 }
 
 void loop() {
   Blynk.run();
   timer.run();
+
+  if (isRunning) {
+    if (millis() - startMillis >= 3000) { // Check if 3 seconds have passed
+      timer.disable(ultrasonicTimerId); // Stop the ultrasonic timer
+      isRunning = false; // Reset the flag
+      Serial.println("Realtime ultrasonic function stopped.");
+    }
+  }
 }

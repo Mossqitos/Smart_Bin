@@ -84,16 +84,19 @@ void SMESensor() {
       if(isHuman == '1') {
         if(isBin == '1') {
           ultraSerial.println(true);
-          Serial.print("HIII");
+          Serial.println("HIII");
           servo.write(90);
           Blynk.virtualWrite(V2, 90);
           delay(3000);
           servo.write(0);
           int ngangState = digitalRead(NGANG_PIN);
-          if(ngangState == 1) {
+          Serial.println(ngangState);
+          if(ngangState == 0) {
+            Serial.println("Bin didn't close");
             Blynk.virtualWrite(V2, 1);
+          } else {
+            Blynk.virtualWrite(V2, 0);
           }
-          Blynk.virtualWrite(V2, 0);
           ultraSerial.println(false);
         }
         else {
