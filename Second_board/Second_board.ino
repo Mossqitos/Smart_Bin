@@ -73,8 +73,8 @@ void ultrasonic() // measure height in dustbin
         binLevel = 0;
       }
     }
-    Blynk.virtualWrite(V0, distance);
-    Blynk.virtualWrite(V1, binLevel);
+    // Blynk.virtualWrite(V0, distance);
+    // Blynk.virtualWrite(V1, binLevel);
 
     Serial.print("Measured Distance: ");
     Serial.print(distance);

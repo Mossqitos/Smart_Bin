@@ -8,6 +8,18 @@
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 
+#define SMTP_HOST "smtp.gmail.com"
+#define SMTP_PORT 465
+
+#define AUTHOR_EMAIL "beer.tarit@gmail.com"
+#define AUTHOR_PASSWORD "tolv vmov gxgb rmsj"
+
+#define RECIPIENT_EMAIL "thanakitmoss@gmail.com"
+
+SMTPSession smtp;
+
+void smtpCallback(SMTP_Status status);
+
 #define RXD1 14 //รับว่าขยะเต็มไหม
 #define TXD1 27
 
@@ -16,6 +28,8 @@
 
 #define RXD3 12 
 #define TXD3 13 //ให้ultrasonic ทำงาาน
+
+int threshold = 300;
 
 char auth[] = BLYNK_AUTH_TOKEN;
 char ssid[] = "Tamao"; // wifi or hotspot name
@@ -27,6 +41,7 @@ BlynkTimer timer;
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 
+#define MQ_PIN 19
 #define ESP_BAUD 115200
 #define IR_PIN 23
 #define SERVO_PIN 22
@@ -43,12 +58,43 @@ void setup() {
   binSerial.begin(ESP_BAUD, SERIAL_8N1, RXD1, TXD1);
   ultraSerial.begin(ESP_BAUD, SERIAL_8N1, RXD3, TXD3);
   Blynk.begin(auth, ssid, pass);
+  pinmode(MQ_PIN, INPUT);
   pinMode(IR_PIN, INPUT);
   pinMode(NGANG_PIN, INPUT);
   servo.attach(SERVO_PIN);
   servo.write(0);
+
+  message.sender.name = F("SmartBIN");
+  message.sender.email = AUTHOR_EMAIL;
+  message.subject = F("Notification From Bin");
+  message.addRecipient(F("Bro"), RECIPIENT_EMAIL);
+
+  String textMsg2 = "Your BIN IS ON FIREEEEEE";
+  message.text.content = textMsg1.c_str();
+  message.text.charSet = "us-ascii";
+  message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+
   Serial.println("Serial 2 started at 115200 baud rate");
+  timer.setInterval(1000L, MQSensor);
   timer.setInterval(1000L, SMESensor);
+}
+
+void MQSensor() {
+  int MQData = analogRead(MQ_PIN);
+  Serial.print("MQ Value: ");
+  Serial.println(MQData);
+
+  if(MQData > threshold) {
+    String textMsg1 = "Your Bin is on fired";
+    message.text.content = textMsg1.c_str();
+    message.text.charSet = "us-ascii";
+    message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+    message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
+    message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+    if (!MailClient.sendMail(&smtp, &message)) {
+      ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+    }
+  }
 }
 
 void SMESensor() {
@@ -92,10 +138,15 @@ void SMESensor() {
           int ngangState = digitalRead(NGANG_PIN);
           Serial.println(ngangState);
           if(ngangState == 0) {
-            Serial.println("Bin didn't close");
-            Blynk.virtualWrite(V2, 1);
-          } else {
-            Blynk.virtualWrite(V2, 0);
+            String textMsg1 = "Your Bin isn't closed";
+            message.text.content = textMsg1.c_str();
+            message.text.charSet = "us-ascii";
+            message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+            message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
+            message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+            if (!MailClient.sendMail(&smtp, &message)) {
+              ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+            }
           }
           ultraSerial.println(false);
         }
