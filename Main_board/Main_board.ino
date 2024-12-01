@@ -98,14 +98,13 @@ void MQSensor() {
     message.subject = F("Notification From Bin");
     message.addRecipient(F("Beer"), RECIPIENT_EMAIL);
 
-    String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!";
+    String subject = " 🗑️ Your Smart Bin is detect some cause of fire.";
 
-    String textMsg = "Dear User,\n\n"
+    String textMsg =  "Dear User,\n\n"
                       "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
                       "Here are some tips to keep it in good condition:\n\n"
-                      "Empty the bin regularly to prevent overfilling.\n\n"
-                      "Ensure the lid is properly closed after use.\n\n"
                       "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
+                      "Please checking your bin there might be an accidently fire happen\n\n"
                       "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
 
                       "Thank you for being a valued Smart Bin user!\n\n";
@@ -194,14 +193,13 @@ void SMESensor() {
           message.subject = F("Notification From Bin");
           message.addRecipient(F("Beer"), RECIPIENT_EMAIL);
 
-          String subject = " 🗑️ Reminder: Time to Check Your Smart Bin!";
+          String subject = " 🗑️ Your Smart Bin can not close perfectly, there might be something struct.";
 
-          String textMsg = "Dear User,\n\n"
+          String textMsg =  "Dear User,\n\n"
                             "This is a friendly reminder to check your Smart Bin to ensure it is operating efficiently.\n\n"
                             "Here are some tips to keep it in good condition:\n\n"
-                            "Empty the bin regularly to prevent overfilling.\n\n"
                             "Ensure the lid is properly closed after use.\n\n"
-                            "Inspect for any unusual activity, such as fire alerts or malfunctions.\n\n"
+                            "Please checking your bin there might something struct that lead to bin does not close perfectly\n\n"
                             "Keeping your Smart Bin maintained helps promote hygiene and safety.\n\n\n\n"
 
                             "Thank you for being a valued Smart Bin user!\n\n";
