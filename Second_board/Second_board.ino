@@ -13,9 +13,6 @@ char pass[] = "12345679"; // wifi or hotspot pass
 
 BlynkTimer timer;
 
-#define RXD2 33
-#define TXD2 32
-
 #define RXD1 14
 #define TXD1 27
 
@@ -33,13 +30,11 @@ unsigned long startMillis;
 bool isRunning = false;
 
 #define ESP_BAUD 115200
-HardwareSerial humanSerial(2);
 HardwareSerial binSerial(1);
 HardwareSerial ultraSerial(3);
 
 void setup() {
   Serial.begin(115200) ;
-  humanSerial.begin(ESP_BAUD, SERIAL_8N1, RXD2, TXD2);
   binSerial.begin(ESP_BAUD, SERIAL_8N1, RXD1, TXD1);
   ultraSerial.begin(ESP_BAUD, SERIAL_8N1, RXD3, TXD3);
   pinMode(trigPin, OUTPUT);  
@@ -86,8 +81,8 @@ void ultrasonic() // measure height in dustbin
 }
 void SMESensor() {
   // put your main code here, to run repeatedly:
-  while (humanSerial.available() >0) {
-    char sendIt = humanSerial.read();
+  while (binSerial.available() >0) {
+    char sendIt = binSerial.read();
     Serial.println(sendIt);
     if(sendIt == '1') {
       digitalWrite(trigPin, LOW);
@@ -138,13 +133,13 @@ void SMESensor() {
       //   }
       // // }
     }
-    humanSerial.read();
-    humanSerial.read();
-    humanSerial.read();
-    humanSerial.read();
-    humanSerial.read();
-    humanSerial.read();
-    humanSerial.read();
+    binSerial.read();
+    binSerial.read();
+    binSerial.read();
+    binSerial.read();
+    binSerial.read();
+    binSerial.read();
+    binSerial.read();
   }
 
 }
