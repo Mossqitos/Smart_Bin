@@ -148,7 +148,8 @@ void SMESensor() {
     //ส่งค่าirไปยังอีกบอร์ด
     binSerial.println(true);
     Serial.println("send done");
-    while (binSerial.available() > 0 && !objectDetected) {
+    objectDetected = true;
+    while (binSerial.available() > 0) {
       Serial.print("BIN status: ");
       char isBin = binSerial.read();
       Serial.println(isBin);
@@ -160,7 +161,6 @@ void SMESensor() {
       Serial.println(binSerial.read());
 
       binSerial.println(false);
-      objectDetected = true;
       if(isBin == '1') {
         ultraSerial.println(true);
         Serial.println("HIII");
@@ -239,8 +239,6 @@ void SMESensor() {
       else {
         Serial.print("BIN TEM I KWAUY");
       }
-    } else {
-      Serial.println("U R NOT HUMAN    U R GAY");
     }
   }
   if(irState == 1 && objectDetected) {

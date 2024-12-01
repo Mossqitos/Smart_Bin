@@ -111,27 +111,17 @@ void SMESensor() {
       Serial.print("Bin Level: ");
       Serial.print(binLevel);
       Serial.println(" %");
-      humanSerial.println(true);
       if(binLevel < 100) {
         Serial.println("good");
         binSerial.println(true);
         Serial.println("Realtime ultrasonic function started.");\
-        timer.enable(ultrasonicTimerId);
-        startMillis = millis();
-        isRunning = true; 
+        // timer.enable(ultrasonicTimerId);
+        // startMillis = millis();
+        // isRunning = true; 
         Serial.println("Realtime ultrasonic function stoped.");
       } else {
         binSerial.println(false);
       }
-      // // while ( ultraSerial.available() > 0) {
-      //   if(doUltra == '1') {
-      //     // timer.enable(ultrasonicTimerId);
-      //     Serial.println("Realtime ultrasonic function started.");
-      //     delay(3000);
-      //     // timer.disable(ultrasonicTimerId);
-      //     Serial.println("Realtime ultrasonic function stoped.");
-      //   }
-      // // }
     }
     binSerial.read();
     binSerial.read();
