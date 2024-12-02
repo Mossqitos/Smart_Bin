@@ -1,6 +1,10 @@
-#define BLYNK_TEMPLATE_ID "TMPL6bzWWVz0V"
-#define BLYNK_TEMPLATE_NAME "Blynk Smart Dustbin"
-#define BLYNK_AUTH_TOKEN "m2AwC6IOqkGFUYams3erIs0IK67HLK72"
+// #define BLYNK_TEMPLATE_ID "TMPL6bzWWVz0V"
+// #define BLYNK_TEMPLATE_NAME "Blynk Smart Dustbin"
+// #define BLYNK_AUTH_TOKEN "m2AwC6IOqkGFUYams3erIs0IK67HLK72"
+
+#define BLYNK_TEMPLATE_ID "TMPL6JY0-HgUW"
+#define BLYNK_TEMPLATE_NAME "embed"
+#define BLYNK_AUTH_TOKEN "ojSk5RFycVV4Xn7HuV8G2dqFPhmNSAjI"
 
 #define BLYNK_PRINT Serial
 
@@ -57,7 +61,7 @@ void ultrasonic() // measure height in dustbin
     duration = pulseIn(echoPin, HIGH);
     // store in distance var
     distance = duration * 0.034 / 2; //formula to calculate the distance for ultrasonic sensor
-    binLevel=map(distance, 21, 0, 0,100); // 21 ปรับเป็นความสูง dustbin
+    binLevel=map(distance, 19, 0, 0,100); // 19 ปรับเป็นความสูง dustbin
     if(distance >21 ) {
       if(distance > 1000) {
         distance = 0;
@@ -68,8 +72,8 @@ void ultrasonic() // measure height in dustbin
         binLevel = 0;
       }
     }
-    // Blynk.virtualWrite(V0, distance);
-    // Blynk.virtualWrite(V1, binLevel);
+    Blynk.virtualWrite(V0, distance);
+    Blynk.virtualWrite(V1, binLevel);
 
     Serial.print("Measured Distance: ");
     Serial.print(distance);
@@ -84,6 +88,7 @@ void SMESensor() {
   while (binSerial.available() >0) {
     char sendIt = binSerial.read();
     Serial.println(sendIt);
+    delay(500);
     if(sendIt == '1') {
       digitalWrite(trigPin, LOW);
       delayMicroseconds(2);
@@ -93,14 +98,14 @@ void SMESensor() {
       duration = pulseIn(echoPin, HIGH);
       // store in distance var
       distance = duration * 0.034 / 2; //formula to calculate the distance for ultrasonic sensor
-      binLevel=map(distance, 21, 0, 0,100); // 21 ปรับเป็นความสูง dustbin
-      if(distance >21 ) {
+      binLevel=map(distance, 19, 0, 0,100); // 21 ปรับเป็นความสูง dustbin
+      if(distance >19 ) {
         if(distance > 1000) {
           distance = 0;
           binLevel = 100;
         }
         else {
-          distance = 21;
+          distance = 19;
           binLevel = 0;
         }
       }
@@ -111,13 +116,15 @@ void SMESensor() {
       Serial.print("Bin Level: ");
       Serial.print(binLevel);
       Serial.println(" %");
-      if(binLevel < 100) {
+      if(binLevel < 90) {
         Serial.println("good");
         binSerial.println(true);
+        delay(500);
         Serial.println("Realtime ultrasonic function started.");\
-        // timer.enable(ultrasonicTimerId);
-        // startMillis = millis();
-        // isRunning = true; 
+        timer.enable(ultrasonicTimerId);
+        startMillis = millis();
+        isRunning = true; 
+        delay(3000);
         Serial.println("Realtime ultrasonic function stoped.");
       } else {
         binSerial.println(false);
@@ -139,7 +146,7 @@ void loop() {
   timer.run();
 
   if (isRunning) {
-    if (millis() - startMillis >= 3000) { // Check if 3 seconds have passed
+    if (millis() - startMillis >= 5000) { // Check if 3 seconds have passed
       timer.disable(ultrasonicTimerId); // Stop the ultrasonic timer
       isRunning = false; // Reset the flag
       Serial.println("Realtime ultrasonic function stopped.");
